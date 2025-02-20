@@ -35,3 +35,18 @@ git clone https://github.com/your-repo-name/stock-price-cache.git
 cd stock-price-cache
 
 ```
+
+## Build and Start the Services
+### Make sure you are in the root directory of the project, then build and start the services using Docker Compose:
+
+```bash
+docker-compose up -d --build --force-recreate
+```
+
+## Verify the Services Are Running
+### After the services are up and running, you can check if they are operating as expected.
+
+1. *FastAPI* is running on http://localhost:8000.
+2. *Spring Boot* is running on http://localhost:8080.
+3. *Redis* is running on localhost:6379.
+4. *Web Frontend* is available on http://localhost.
