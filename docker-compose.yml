@@ -25,10 +25,10 @@ services:
     container_name: backend
     ports:
       - "8000:8000"
+    depends_on:
+      - stock-cache
     networks:
       - stock-price-network
-    depends_on:
-      - frontend
 
   frontend:
     build:
@@ -37,6 +37,8 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+    depends_on:
+      - backend
     networks:
       - stock-price-network
 
