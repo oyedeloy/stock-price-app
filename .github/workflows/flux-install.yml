@@ -1,8 +1,8 @@
 name: Install FluxCD
 
 on:
-  push:
-    branches: [ "main" ]
+  repository_dispatch:
+    types: [flux-install]
 
 jobs:
   install-flux:
@@ -18,7 +18,7 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      - name: Authenticate with AWS EKS
+      - name: Configure AWS CLI and update kubeconfig
         run: |
           aws eks --region us-east-2 update-kubeconfig --name my-eks-cluster
 

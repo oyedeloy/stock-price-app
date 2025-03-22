@@ -1,7 +1,9 @@
-name: Terraform Infrastructure CI
+name: Provision Infrastructure
 
 on:
   push:
+    paths:
+      - 'terraform/**'
     branches: [ "main" ]
 
 jobs:
@@ -12,6 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -19,24 +24,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Install Ansibl
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
-
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Plan
-        run: terraform plan
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
         working-directory: terraform
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform destroy -auto-approve
-        working-directory: terraform
+      - name: Trigger FluxCD Install
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: flux-install
 
