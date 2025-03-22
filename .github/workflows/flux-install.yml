@@ -1,0 +1,40 @@
+name: Install FluxCD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  install-flux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Authenticate with AWS EKS
+        run: |
+          aws eks --region us-east-2 update-kubeconfig --name my-eks-cluster
+
+      - name: Create flux-system namespace
+        run: |
+          kubectl create namespace flux-system || echo "Namespace already exists"
+
+      - name: Install Flux CLI
+        run: |
+          curl -s https://fluxcd.io/install.sh | sudo bash
+
+      - name: Bootstrap FluxCD
+        run: |
+          flux bootstrap github \
+            --owner=<your-github-username> \
+            --repository=<your-gitops-repo> \
+            --branch=main \
+            --path=./clusters/my-cluster \
+            --personal
