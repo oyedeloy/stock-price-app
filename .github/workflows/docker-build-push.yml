@@ -1,0 +1,57 @@
+name: Build & Push Docker Images to ECR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'cache/**'
+      - '.github/workflows/docker-build-push.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set ECR variables
+        id: vars
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
+          echo "ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> $GITHUB_ENV
+
+      - name: Build, Tag, and Push Backend
+        run: |
+          IMAGE=$ECR_REGISTRY/stock-backend:latest
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+
+      - name: Build, Tag, and Push Frontend
+        run: |
+          IMAGE=$ECR_REGISTRY/stock-frontend:latest
+          docker build -t $IMAGE ./frontend
+          docker push $IMAGE
+
+      - name: Build, Tag, and Push Redis
+        run: |
+          IMAGE=$ECR_REGISTRY/stock-redis:latest
+          docker build -t $IMAGE ./cache
+          docker push $IMAGE
