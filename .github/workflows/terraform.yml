@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'terraform/**'
-      - '.github/workflows/terraform-infra.yml'
+      - '.github/workflows/'
       - '**/*.tf'
       - 'modules/**'
 jobs:
