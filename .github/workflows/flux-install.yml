@@ -36,6 +36,8 @@ jobs:
           curl -s https://fluxcd.io/install.sh | sudo bash
 
       - name: Bootstrap FluxCD
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLUX_GITHUB_TOKEN }}
         run: |
           flux bootstrap github \
             --owner=oyedeloy \
