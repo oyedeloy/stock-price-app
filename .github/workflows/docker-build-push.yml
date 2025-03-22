@@ -1,57 +1,46 @@
-name: Build & Push Docker Images to ECR
+name: Build and Push Docker Images
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'cache/**'
-      - '.github/workflows/docker-build-push.yml'
+  repository_dispatch:
+    types: [docker-build]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-2
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set ECR variables
-        id: vars
+      - name: Build and Push Backend Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-          echo "ACCOUNT_ID=$ACCOUNT_ID" >> $GITHUB_ENV
-          echo "ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com" >> $GITHUB_ENV
+          docker build -t $ECR_REGISTRY/stock-backend:latest ./backend
+          docker push $ECR_REGISTRY/stock-backend:latest
 
-      - name: Build, Tag, and Push Backend
+      - name: Build and Push Frontend Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          IMAGE=$ECR_REGISTRY/stock-backend:latest
-          docker build -t $IMAGE ./backend
-          docker push $IMAGE
+          docker build -t $ECR_REGISTRY/stock-frontend:latest ./frontend
+          docker push $ECR_REGISTRY/stock-frontend:latest
 
-      - name: Build, Tag, and Push Frontend
+      - name: Build and Push Redis Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          IMAGE=$ECR_REGISTRY/stock-frontend:latest
-          docker build -t $IMAGE ./frontend
-          docker push $IMAGE
+          docker build -t $ECR_REGISTRY/stock-redis:latest ./cache
+          docker push $ECR_REGISTRY/stock-redis:latest
 
-      - name: Build, Tag, and Push Redis
-        run: |
-          IMAGE=$ECR_REGISTRY/stock-redis:latest
-          docker build -t $IMAGE ./cache
-          docker push $IMAGE
