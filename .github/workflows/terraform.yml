@@ -39,7 +39,7 @@ jobs:
         run: terraform plan -out=tfplan.out
         working-directory: terraform
 
-      - name: Terraform Apply
+      - name: Terraform Aply
         run: terraform destroy -auto-approve 
         working-directory: terraform
 
