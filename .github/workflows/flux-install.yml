@@ -1,4 +1,4 @@
-name: install-flux
+name: flux-install
 
 on:
   repository_dispatch:
@@ -44,4 +44,5 @@ jobs:
             --repository=stock-price-app \
             --branch=main \
             --path=clusters/my-cluster \
-            --personal
+            --personal \
+            --force
