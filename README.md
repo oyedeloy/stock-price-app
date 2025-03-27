@@ -9,7 +9,7 @@ This project consists of a **FastAPI** service that fetches stock prices from a 
 
 1. **FastAPI** (`stock-api`): This service exposes an API that allows clients to get stock prices by providing a ticker symbol and date. It first checks the cache (Redis) via the Spring Boot application, and if the data is not available, it fetches the data externally (mocked in this case) and stores it in Redis.
    
-2. **Spring Boot** (`stock-cache`): This service provides caching capabilities, storing and retrieving stock prices in Redis.
+2. **Spring Boot** (`stock-cache`): This service provides caching capabilities, storing and retrieving stock prices in Redis..
 
 3. **Redis** (`redis`): The cache store where stock prices are stored temporarily.
 
