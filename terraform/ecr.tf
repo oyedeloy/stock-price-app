@@ -10,5 +10,5 @@ module "ecr_frontend" {
 
 module "ecr_redis" {
   source    = "./modules/ecr"
-  repo_name = "stock-redis"
+  repo_name = "stock-cache"
 }
