@@ -1,4 +1,4 @@
-rresource "aws_ecr_repository" "this" {
+resource "aws_ecr_repository" "this" {
   name = var.repo_name
 
   image_scanning_configuration {
