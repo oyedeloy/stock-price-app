@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "this" {
+rresource "aws_ecr_repository" "this" {
   name = var.repo_name
 
   image_scanning_configuration {
@@ -12,4 +12,8 @@ resource "aws_ecr_repository" "this" {
   tags = {
     Name = var.repo_name
   }
+
+  # Enable force delete to remove non-empty repositories
+  force_delete = true
 }
+
