@@ -16,6 +16,10 @@ jobs:
   docker:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,17 +35,26 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      # Backend Image
       - name: Build and push backend Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-backend:latest ./backend
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-backend:latest
+          IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/stock-backend:latest"
+          echo "Building backend image with tag $IMAGE"
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
 
+      # Frontend Image
       - name: Build and push frontend Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-frontend:latest ./frontend
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-frontend:latest
+          IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/stock-frontend:latest"
+          echo "Building frontend image with tag $IMAGE"
+          docker build -t $IMAGE ./frontend
+          docker push $IMAGE
 
+      # Cache Image
       - name: Build and push cache Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-cache:latest ./cache
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/stock-cache:latest
+          IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/stock-cache:latest"
+          echo "Building cache image with tag $IMAGE"
+          docker build -t $IMAGE ./cache
+          docker push $IMAGE
