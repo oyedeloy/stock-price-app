@@ -1,4 +1,4 @@
-name: Docker Build and Push to ECR
+name: docker-build-push
 
 on:
   repository_dispatch:

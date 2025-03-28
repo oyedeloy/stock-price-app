@@ -61,5 +61,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: docker-build
+          event-type: docker-build-push
 
