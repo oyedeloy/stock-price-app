@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-cache
+  namespace: workloads
+  labels:
+    app: stock-cache
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stock-cache
+  template:
+    metadata:
+      labels:
+        app: stock-cache
+    spec:
+      serviceAccountName: cache-sa
+      containers:
+      - name: stock-cache
+        image: 794038241343.dkr.ecr.us-east-2.amazonaws.com/stock-cache:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: REDIS_HOST
+          value: "redis-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-cache-service
+  namespace: workloads
+spec:
+  selector:
+    app: stock-cache
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

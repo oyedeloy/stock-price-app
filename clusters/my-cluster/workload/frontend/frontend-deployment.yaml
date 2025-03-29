@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: workloads
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      serviceAccountName: frontend-sa
+      containers:
+      - name: frontend
+        image: 794038241343.dkr.ecr.us-east-2.amazonaws.com/stock-frontend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: BACKEND_HOST
+          value: "backend-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: workloads
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
