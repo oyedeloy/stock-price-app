@@ -1,0 +1,25 @@
+# Role with permissions for cache access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cache-role
+  namespace: workloads
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list", "watch"]
+---
+# RoleBinding for Cache Service Account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cache-rolebinding
+  namespace: workloads
+subjects:
+- kind: ServiceAccount
+  name: cache-sa
+  namespace: workloads
+roleRef:
+  kind: Role
+  name: cache-role
+  apiGroup: rbac.authorization.k8s.io

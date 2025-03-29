@@ -1,5 +1,7 @@
 apiVersion: v1
-kind: ServiceAccount
+kind: Namespace
 metadata:
-  name: frontend-sa
-  namespace: workloads
+  name: workloads
+  labels:
+    environment: production
+    team: app-team
